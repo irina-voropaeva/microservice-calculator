@@ -9,7 +9,7 @@ namespace AuthMicroservice
         [Authorize]
         public IActionResult GetIsTokenValid()
         {
-            return Ok("valid");
+            return Ok($"valid, {User.Identity.Name}");
         }
     }
 }

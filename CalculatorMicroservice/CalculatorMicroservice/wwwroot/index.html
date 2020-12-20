@@ -2,13 +2,13 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>JWT в ASP.NET Core Web API</title>
+    <title>Calculator based on microservices</title>
 </head>
 <body>
     <div id="userInfo" style="display:none;">
         <p>You have logged in as: <span id="userName"></span></p>
-        <input type="button" value="Выйти" id="logOut" />
-        
+        <input type="button" value="Log out" id="logOut" />
+
         <div id="calculatorForm">
             <h2>Calculator</h2>
             <input type="radio" onclick="hideImaginary()" id="real" name="numberType" value="Real">
@@ -39,6 +39,19 @@
                 <p>Result: <span id="resultValue"></span></p>
             </div>
 
+            <br />
+            <div>
+                <input type="submit" id="stateSaveButton" onclick="saveState()" value="Save state" />
+            </div>
+            <br />
+            <div>
+                <input type="submit" id="stateGetButton" onclick="getState()" value="Get State" />
+            </div>
+            <br />
+            <div>
+                <input type="submit" id="stateDeleteButton" onclick="deleteState()" value="Delete State From Server" />
+            </div>
+
         </div>
     </div>
     <div id="loginForm">
@@ -47,15 +60,8 @@
         <input type="email" id="emailLogin" /> <br /><br />
         <label>Enter password</label><br />
         <input type="password" id="passwordLogin" /><br /><br />
-        <input type="submit" id="submitLogin" value="Логин" />
+        <input type="submit" id="submitLogin" value="Login" />
     </div>
-    <div>
-        <input type="submit" id="getDataByLogin" value="Данные по логину" />
-    </div>
-    <div>
-        <input type="submit" id="getDataByRole" value="Данные по роли" />
-    </div>
-
     <script>
         var tokenKey = "accessToken";
 
@@ -123,6 +129,81 @@
 
         }
 
+        async function saveState() {
+            const url = "/state";
+            const token = sessionStorage.getItem(tokenKey);
+            const formData = new FormData();
+            if (document.getElementById('real').checked) {
+                formData.append("type", document.getElementById("real").value);
+            } else if (document.getElementById('complex').checked) {
+                formData.append("type", document.getElementById("complex").value);
+            }
+            if (document.getElementById('plus').checked) {
+                formData.append("operation", document.getElementById("plus").value);
+            } else if (document.getElementById('minus').checked) {
+                formData.append("operation", document.getElementById("minus").value);
+            }
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: formData
+            });
+        }
+
+        async function getState() {
+            const url = "/state";
+            const token = sessionStorage.getItem(tokenKey);
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+            });
+            const data = await response.json();
+
+            if (data.operationType == 1) {
+                document.getElementById("plus").checked = true;
+            } else if (data.operationType == 2) {
+                document.getElementById("minus").checked = true;
+            }
+
+            if (data.numberType == 1) {
+                document.getElementById("real").checked = true;
+                document.getElementById("complexInputs").style.display = "none";
+            } else if (data.operationType == 2) {
+                document.getElementById("complex").checked = true;
+                document.getElementById("complexInputs").style.display = "block";
+
+            }
+        }
+
+        async function deleteState() {
+            const url = "/state";
+            const formData = new FormData();
+            const token = sessionStorage.getItem(tokenKey);
+            if (document.getElementById('real').checked) {
+                formData.append("type", document.getElementById("real").value);
+            } else if (document.getElementById('complex').checked) {
+                formData.append("type", document.getElementById("complex").value);
+            }
+            if (document.getElementById('plus').checked) {
+                formData.append("operation", document.getElementById("plus").value);
+            } else if (document.getElementById('minus').checked) {
+                formData.append("operation", document.getElementById("minus").value);
+            }
+            const response = await fetch(url, {
+                method: "DELETE",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: formData
+            });
+        }
         async function getData(url) {
             const token = sessionStorage.getItem(tokenKey);
 

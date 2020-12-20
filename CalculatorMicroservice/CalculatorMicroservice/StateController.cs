@@ -16,13 +16,12 @@ namespace CalculatorMicroservice
         }
 
         [HttpGet("/state")]
-        public IActionResult GetState([Required] NumberType type,
-            [Required] OperationType operation,
-            [Required] string token)
+        public IActionResult GetState()
         {
-            if (RequestIsAuthenticated(token))
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            if (RequestIsAuthenticated(Request.Headers["Authorization"].ToString().Replace("Bearer ", "")))
             {
-                return Ok(_stateService.GetState(token));
+                return Ok(_stateService.GetState(RequestUserEmailByToken(token)));
             }
             else
             {
@@ -32,12 +31,12 @@ namespace CalculatorMicroservice
 
         [HttpPost("/state")]
         public IActionResult AddState([Required] NumberType type,
-            [Required] OperationType operation,
-            [Required] string token)
+            [Required] OperationType operation)
         {
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             if (RequestIsAuthenticated(token))
             {
-                return Ok(_stateService.SetState(operation, type));
+                return Ok(_stateService.SetState(RequestUserEmailByToken(token), operation, type));
             }
             else
             {
@@ -46,12 +45,14 @@ namespace CalculatorMicroservice
         }
 
         [HttpDelete("/state")]
-        public IActionResult RemoveState([Required] string email,
-            [Required] string token)
+        public IActionResult RemoveState()
         {
-            if (RequestIsAuthenticated(token))
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            if (RequestIsAuthenticated(Request.Headers["Authorization"].ToString().Replace("Bearer ", "")))
             {
-                return Ok(_stateService.DeleteState(email));
+                _stateService.DeleteState(RequestUserEmailByToken(token));
+                return Ok();
             }
             else
             {

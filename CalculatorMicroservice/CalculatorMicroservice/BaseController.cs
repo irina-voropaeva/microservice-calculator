@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace CalculatorMicroservice
 {
@@ -28,7 +29,17 @@ namespace CalculatorMicroservice
 
         protected string RequestUserEmailByToken(string token)
         {
-            return "helo";
+            var client = new HttpClient { BaseAddress = new Uri(authUrl) };
+
+            client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            var response = client.GetAsync("").Result;
+
+            return (response.Content.ReadAsStringAsync().Result).Split(",")[1].Trim( new char[] { '\"', '\\' });
+
         }
     }
 }
