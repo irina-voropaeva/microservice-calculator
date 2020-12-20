@@ -39,7 +39,7 @@ namespace AuthMicroservice
             var response = new
             {
                 access_token = encodedJwt,
-                username = identity.Name
+                email = identity.Name
             };
 
             return Json(response);

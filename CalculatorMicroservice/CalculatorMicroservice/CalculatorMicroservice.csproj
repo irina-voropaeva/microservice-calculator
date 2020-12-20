@@ -5,7 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.6.3" />
   </ItemGroup>
 
 </Project>

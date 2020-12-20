@@ -1,30 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Security.Cryptography.Xml;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CalculatorMicroservice
 {
-    public class CalculateController : Controller
+    public class CalculateController : BaseController
     {
-        private string authUrl = "http://localhost:5000/TokenValidation/GetIsTokenValid";
-        
-        public IActionResult Calculate(string type, string operation, string number1, string number2, string token)
+        private readonly CalculatorService _calculatorService;
+        public CalculateController()
         {
-            if (IsAuthenticated(token))
+            _calculatorService = new CalculatorService();
+        }
+        
+        [HttpPost("/calculate")]
+        public IActionResult Calculate([Required] NumberType type, 
+            [Required] OperationType operation, 
+            [Required] double real1,
+            double imaginary1,
+            [Required] double real2,
+            double imaginary2)
+        {
+            if (RequestIsAuthenticated(Request.Headers["Authorization"].ToString().Replace("Bearer ", "")))
             {
-                return Ok("Hello))");
+                return Ok(_calculatorService.Calculate(type, operation, real1, real2, imaginary1, imaginary2));
             }
             else
             {
                 return Unauthorized("Please authorize!");
             }
-        }
-
-        private bool IsAuthenticated(string token)
-        {
-            return true;
         }
     }
 }
