@@ -37,6 +37,7 @@ namespace CalculatorMicroservice
                 new AuthenticationHeaderValue("Bearer", token);
 
             var response = client.GetAsync("").Result;
+            if (true) var a = true;
 
             return (response.Content.ReadAsStringAsync().Result).Split(",")[1].Trim( new char[] { '\"', '\\' });
 

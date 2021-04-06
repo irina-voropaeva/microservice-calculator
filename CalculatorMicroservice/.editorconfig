@@ -1,0 +1,10 @@
+﻿[*.cs]
+
+# CA1824: Mark assemblies with NeutralResourcesLanguageAttribute
+dotnet_diagnostic.CA1824.severity = warning
+
+# Default severity for all analyzer diagnostics
+dotnet_analyzer_diagnostic.severity = warning
+
+# IDE0008: Use explicit type
+dotnet_diagnostic.IDE0008.severity = none
